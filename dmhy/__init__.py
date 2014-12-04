@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 #get an parameter, keywords it can be a string or a list
 def Search( keywords ):
 
-    if type(keywords) in (unicode, str):
+    if type(keywords) in (str,):
         #keywords should split by space(s)
         url = u"http://share.dmhy.org/topics/list?keyword={keyword}".format( keyword= '+'.join(filter( None ,keywords.split(' '))))
     elif type(keywords) is list:
