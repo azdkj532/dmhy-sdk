@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
+import re
+
 import urllib3
 from bs4 import BeautifulSoup
-import re
 
 #get an parameter, keywords it can be a string or a list
 def Search( keywords ):
