@@ -15,11 +15,11 @@ return a magnet link.
 ##Usage
 go to your working directory and clone this repo
 ```
-git clone https://github.com/azdkj532/dmhy.git
+git clone https://github.com/azdkj532/dmhy-sdk.git
 ```
 install dependent package
 ```
-python dmhy/setup.py install
+python dmhy-sdk/setup.py install
 ```
 open python file and import this package.
 ```python
