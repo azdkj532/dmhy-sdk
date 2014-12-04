@@ -16,7 +16,6 @@ def Search( keywords ):
     else:
         return []
 
-    print type(keywords)
     page = urllib3.PoolManager()
     res = page.request( 'GET', url )
     if res.status != 200 :
