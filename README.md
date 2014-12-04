@@ -1,7 +1,7 @@
 dmhy
 ====
 ##Desciption
-a parser for dmhy ( http://share.dmhy.org/ )
+a CLI tool for dmhy ( http://share.dmhy.org/ )
 
 ##Functions
 ###Search
