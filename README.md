@@ -3,7 +3,7 @@ dmhy
 ##Desciption
 a parser for dmhy ( http://share.dmhy.org/ )
 
-##API
+##Functions
 ###Search
 it needs one parameter which can be a string or a list.
 note that when using string type, all keywords should split by space.
