@@ -17,13 +17,16 @@ go to your working directory and clone this repo
 ```
 git clone https://github.com/azdkj532/dmhy.git
 ```
+install dependent package
+```
+python dmhy/setup.py install
+```
 open python file and import this package.
 ```python
 import dmhy
 ```
 that's all.
 ##Dependency
-you also need some third party packages.
 <ul>
 <li>BeautifulSoup4</li>
 <li>urllib3</li>
