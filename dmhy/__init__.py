@@ -16,9 +16,7 @@ def Search( keywords ):
         return []
     keywords = [ quote(_) for _ in filter( None, keywords )]
     url = u"http://share.dmhy.org/topics/list?keyword={keyword}".format( keyword='+'.join(keywords) ) 
-    print( url )
     
-    return []
     try:
         res = urlopen(url)
     except:
