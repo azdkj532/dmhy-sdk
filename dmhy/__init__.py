@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 import re
+from urllib.request import urlopen
+from urllib.parse   import quote
 
-import urllib3
 from bs4 import BeautifulSoup
 
 #get an parameter, keywords it can be a string or a list
@@ -10,18 +11,22 @@ def Search( keywords ):
 
     if type(keywords) in (str,):
         #keywords should split by space(s)
-        url = u"http://share.dmhy.org/topics/list?keyword={keyword}".format( keyword= '+'.join(filter( None ,keywords.split(' '))))
+        url = u"http://share.dmhy.org/topics/list?keyword={keyword}".format( keyword=quote('+'.join(filter( None ,keywords.split(' ')))) )
     elif type(keywords) is list:
-        url = u"http://share.dmhy.org/topics/list?keyword={keyword}".format( keyword='+'.join(filter( None,keywords) ))
+        url = u"http://share.dmhy.org/topics/list?keyword={keyword}".format( keyword=quote('+'.join(filter( None,keywords) )) )
     else:
         return []
 
-    page = urllib3.PoolManager()
-    res = page.request( 'GET', url )
+    
+    try:
+        res = urlopen(url)
+    except:
+        return []
+        
     if res.status != 200 :
         return []
 
-    parser = BeautifulSoup( res.data )
+    parser = BeautifulSoup( res.read() )
     try:
         table = parser.find( id='topic_list').tbody.find_all('tr')
     except: return []
@@ -42,17 +47,16 @@ def Search( keywords ):
 
 #parameter url must be an absolute path ( including http://... )
 def GetMagnetLink( url ):
-    page = urllib3.PoolManager()
     try:
-        res = page.request( 'GET', url.encode('utf-8') )
+        res = urlopen( 'GET', url )
     except:
         return None
-    else:
          #the http status
-         if res.status != 200:
-             return None
-         magnet = re.findall( r"magnet:[^\"\s<>]*", res.data )
-         if len(magnet) != 0:
-             return magnet[0]
-         else:
-             return None
+    if res.status != 200:
+        return None
+    data = res.read()
+    magnet = re.findall( r"magnet:[^\"\s<>]*", data )
+    if len(magnet) != 0:
+        return magnet[0]
+    else:
+        return None
