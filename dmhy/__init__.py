@@ -55,7 +55,6 @@ def GetMagnetLink( url ):
     if res.status != 200:
         print( "network error: %d " % res.status )
         return None
-    print( type(data) )
     magnet = re.findall( r"magnet:[^\"\s<>]*", data )
     if len(magnet) != 0:
         return magnet[0]
