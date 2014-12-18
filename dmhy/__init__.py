@@ -11,13 +11,14 @@ def Search( keywords ):
 
     if type(keywords) in (str,):
         #keywords should split by space(s)
-        url = u"http://share.dmhy.org/topics/list?keyword={keyword}".format( keyword=quote('+'.join(filter( None ,keywords.split(' ')))) )
-    elif type(keywords) is list:
-        url = u"http://share.dmhy.org/topics/list?keyword={keyword}".format( keyword=quote('+'.join(filter( None,keywords) )) )
+        keywords = filter( None ,keywords.split(' '))
     else:
         return []
-
+    keywords = [ quote(_) for _ in filter( None, keywords )]
+    url = u"http://share.dmhy.org/topics/list?keyword={keyword}".format( keyword='+'.join(keywords) ) 
+    print( url )
     
+    return []
     try:
         res = urlopen(url)
     except:
