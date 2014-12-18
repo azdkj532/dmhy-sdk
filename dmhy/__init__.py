@@ -47,13 +47,15 @@ def Search( keywords ):
 #parameter url must be an absolute path ( including http://... )
 def GetMagnetLink( url ):
     try:
-        res = urlopen( 'GET', url )
+        res = urlopen( url )
     except:
         return None
          #the http status
+    data = res.read().decode('utf-8')
     if res.status != 200:
+        print( "network error: %d " % res.status )
         return None
-    data = res.read()
+    print( type(data) )
     magnet = re.findall( r"magnet:[^\"\s<>]*", data )
     if len(magnet) != 0:
         return magnet[0]
