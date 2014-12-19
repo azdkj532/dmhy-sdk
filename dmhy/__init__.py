@@ -32,7 +32,7 @@ def Search( keywords ):
     else:
         download_list = []
         for topic in table:
-            date = topic.find(style="display: none;").get_text().encode("utf-8")
+            date = topic.find(style="display: none;").get_text()
             source = topic.find( target="_blank" )
             while source.find('span') != None :
                 source.span.unwrap()
