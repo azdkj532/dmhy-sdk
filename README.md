@@ -8,9 +8,13 @@ a CLI tool for dmhy ( http://share.dmhy.org/ )
 it needs one parameter which can be a string or a list.
 note that when using string type, all keywords should split by space.
 return a list contains all topics in first page of searching result.
-###GetMagnetLink
-it needs one parameter, an absolute url of topic.
-return a magnet link.
+##Class
+###dmhy
+This class can create an instance which contains some attribute of each topics, 
+includes title, url and magnet. Maybe I will add other attribute in the future.
+
+Note that attribute 'magnet' won't contain any data before calling the setter of the 'magnet'.
+When something went wrong while getting the magnet link, magnet will be set to None.
 
 ##Usage
 go to your working directory and clone this repo
@@ -29,5 +33,6 @@ that's all.
 ##Dependency
 <ul>
 <li>BeautifulSoup4</li>
-<li>urllib3</li>
+<li>urllib.request</li>
+<li>urllib.parse</li>
 </ul>
