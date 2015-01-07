@@ -96,7 +96,7 @@ def Search( keyword ):
         for topic in table:
             #date = topic.find(style="display: none;").get_text()
             source = topic.find( target="_blank" )
-            while source.find('span') != None :
+            while source.find('span') is not None :
                 source.span.unwrap()
             title = source.get_text().strip()
             url   = "http://share.dmhy.org"+source['href']
