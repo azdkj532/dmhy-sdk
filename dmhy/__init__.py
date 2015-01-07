@@ -66,11 +66,11 @@ class dmhy():
 #get an parameter, keywords it can be a string or a list
 def Search( keywords ):
 
-    if type(keywords) in (str,):
+    if isinstance( keywords, str):
         #keywords should split by space(s)
         keywords = filter( None ,keywords.split(' '))
     else:
-        raise StopIteration
+        raise TypeError 
     keywords = [ quote(_) for _ in filter( None, keywords )]
     url = u"http://share.dmhy.org/topics/list?keyword={keyword}".format( keyword='+'.join(keywords) ) 
     
