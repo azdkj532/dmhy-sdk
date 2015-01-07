@@ -64,13 +64,18 @@ class dmhy():
         self._url = url
 
 #get an parameter, keywords it can be a string or a list
-def Search( keywords ):
+def Search( keyword ):
 
-    if isinstance( keywords, str):
+    if isinstance( keyword, str):
         #keywords should split by space(s)
-        keywords = filter( None ,keywords.split(' '))
+        keywords = filter( None ,keyword.split(' '))
+    elif isinstance( keyword, (list, tuple )):
+        if all([ isinstance(_,str) for _ in keyword ]):
+            keywords = keyword
+        else:
+            raise TypeError("Excepted a string")
     else:
-        raise TypeError 
+        raise TypeError("Expected a string or a list of string") 
     keywords = [ quote(_) for _ in filter( None, keywords )]
     url = u"http://share.dmhy.org/topics/list?keyword={keyword}".format( keyword='+'.join(keywords) ) 
     
