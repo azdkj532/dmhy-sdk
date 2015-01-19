@@ -102,5 +102,8 @@ def Search( keyword ):
                 source.span.unwrap()
             title = source.get_text().strip()
             url   = "http://share.dmhy.org"+source['href']
-            yield dmhy( title=title, url=url )
-
+            magnet = topic.find(class_="download-arrow arrow-magnet")
+            animation = dmhy( title=title, url=url )
+            if magnet:
+                animation.magnet = magnet['href']
+            yield animation
