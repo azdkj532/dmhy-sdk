@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
 import re
-from urllib.request import urlopen
-from urllib.parse   import quote
 
+import requests
 from bs4 import BeautifulSoup
 
 class dmhy():
@@ -20,13 +19,13 @@ class dmhy():
     @staticmethod
     def _GetMagnetLink( url ):
         try:
-            res = urlopen( url )
+            res = requests.get( url )
         except:
             return None
              #the http status
-        data = res.read().decode('utf-8')
-        if res.status != 200:
-            print( "network error: %d " % res.status )
+        data = res.content.decode('utf-8')
+        if res.status_code != 200:
+            print( "network error: %d " % res.status_code )
             return None
         pattern = re.search( r"magnet:[^\"\s<>]*", data )
         if pattern:
@@ -68,28 +67,31 @@ def Search( keyword ):
 
     if isinstance( keyword, str):
         #keywords should split by space(s)
-        keywords = filter( None ,keyword.split(' '))
+        keyword_list = filter( None ,keyword.split(' '))
     elif isinstance( keyword, (list, tuple )):
         if all([ isinstance(_,str) for _ in keyword ]):
-            keywords = keyword
+            keyword_list = keyword
         else:
             raise TypeError("Excepted a string")
     else:
         raise TypeError("Expected a string or a list of string") 
-    keywords = [ quote(_) for _ in filter( None, keywords )]
-    url = u"http://share.dmhy.org/topics/list?keyword={keyword}".format( keyword='+'.join(keywords) ) 
+    keyword_list = [ _ for _ in filter( None, keyword_list )]
+    url = u"http://share.dmhy.org/topics/list?keyword={0}".format( '+'.join(keyword_list) ) 
     
     try:
-        res = urlopen(url)
+        res = requests.get(url)
     except:
         raise StopIteration
 
-    if res.status != 200 :
+    
+    print(res.status_code)
+    if res.status_code != 200 :
         raise StopIteration
 
-    parser = BeautifulSoup( res.read() )
+    html =res.content
+    parser = BeautifulSoup(html.decode())
     try:
-        table = parser.find( id='topic_list').tbody.find_all('tr')
+        table = parser.find(id='topic_list').tbody.find_all('tr')
     except: 
         raise StopIteration
     else:

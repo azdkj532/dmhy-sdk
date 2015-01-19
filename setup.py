@@ -10,7 +10,6 @@ setup(name='dmhy',
       packages=['dmhy'],
       install_requires=[
           'BeautifulSoup4',
-          'urllib.request',
-          'urllib.parse'
+          'requests'
       ],
       zip_safe=False)
