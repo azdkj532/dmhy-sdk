@@ -10,6 +10,7 @@ class dmhy():
         self._title = title
         self._url = url
         self._magnet = ""
+        self.date = ""
     def __str__( self ):
         return self._title
     def __rper__( self ):
@@ -62,6 +63,16 @@ class dmhy():
             raise TypeError("Excepted a string")
         self._url = url
 
+    @property
+    def date(self):
+        return self._date
+    @date.setter
+    def date(self, date):
+        if isinstance(date, str):
+            self._date = date
+        else:
+            raise TypeError("Excepted a string")
+
 #get an parameter, keywords it can be a string or a list
 def Search( keyword ):
 
@@ -96,7 +107,7 @@ def Search( keyword ):
         raise StopIteration
     else:
         for topic in table:
-            #date = topic.find(style="display: none;").get_text()
+            date = topic.find(style="display: none;").get_text()
             source = topic.find( target="_blank" )
             while source.find('span') is not None :
                 source.span.unwrap()
@@ -106,4 +117,5 @@ def Search( keyword ):
             animation = dmhy( title=title, url=url )
             if magnet:
                 animation.magnet = magnet['href']
+            animation.date = date
             yield animation
