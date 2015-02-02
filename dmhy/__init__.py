@@ -5,6 +5,22 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
+def GetMagnetLink( url ):
+    try:
+        res = requests.get( url )
+    except:
+        return None
+         #the http status
+    data = res.content.decode('utf-8')
+    if res.status_code != 200:
+        print( "network error: %d " % res.status_code )
+        return None
+    pattern = re.search( r"magnet:[^\"\s<>]*", data )
+    if pattern:
+        return pattern.group()
+    else:
+        return None
+
 class dmhy():
     def __init__( self, title="", url="" ):
         self._title = title
@@ -17,23 +33,6 @@ class dmhy():
         return self._title
 
     #parameter url must be an absolute path ( including http://... )
-    @staticmethod
-    def _GetMagnetLink( url ):
-        try:
-            res = requests.get( url )
-        except:
-            return None
-             #the http status
-        data = res.content.decode('utf-8')
-        if res.status_code != 200:
-            print( "network error: %d " % res.status_code )
-            return None
-        pattern = re.search( r"magnet:[^\"\s<>]*", data )
-        if pattern:
-            return pattern.group()
-        else:
-            return None
-
     @property
     def title(self):
         return self._title
@@ -46,7 +45,7 @@ class dmhy():
     @property
     def magnet(self):
         if not self._magnet:
-            self._magnet = self._GetMagnetLink(self._url)
+            self._magnet = self.GetMagnetLink(self._url)
         return self._magnet
     @magnet.setter
     def magnet(self, magnet):
