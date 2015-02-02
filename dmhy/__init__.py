@@ -93,8 +93,6 @@ def Search( keyword ):
     except:
         raise StopIteration
 
-    
-    print(res.status_code)
     if res.status_code != 200 :
         raise StopIteration
 
