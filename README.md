@@ -31,8 +31,7 @@ import dmhy
 ```
 that's all.
 ##Dependency
-<ul>
-<li>BeautifulSoup4</li>
-<li>urllib.request</li>
-<li>urllib.parse</li>
-</ul>
+
+
+* BeautifulSoup4
+* requests
