@@ -107,7 +107,7 @@ def Search(keyword):
         raise StopIteration
 
     html = res.content
-    parser = BeautifulSoup(html.decode())
+    parser = BeautifulSoup(html.decode(), "html.parser")
     try:
         table = parser.find(id='topic_list').tbody.find_all('tr')
     except:
