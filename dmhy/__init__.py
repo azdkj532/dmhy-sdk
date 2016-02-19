@@ -5,85 +5,68 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
+RE_MAGNET = re.compile(r'href="(magnet:.+)"')
 
-def GetMagnetLink(url):
-    try:
-        res = requests.get(url)
-    except:
-        return None
-    data = res.content.decode('utf-8')
-    if res.status_code != 200:  # the http status
-        print("network error: %d " % res.status_code)
-        return None
-    pattern = re.search(r"magnet:[^\"\s<>]*", data)
-    if pattern:
-        return pattern.group()
-    else:
-        return None
+__all__ = [ 'AnimateEntry', 'Search']
 
+class AnimateEntry(object):
+    def __init__(self, title, url, date, magnet_link=None):
+        self.title = title
+        self.url = url
+        self.date = date
+        self._magnet_link = magnet_link
 
-class dmhy():
-    def __init__(self, title="", url=""):
-        self._title = title
-        self._url = url
-        self._magnet = ""
-        self.date = ""
+    def get_magnet_link(self):
+        if self._magnet_link:
+            return self._magnet_link
 
-    def __str__(self):
-        return self._title
+        try:
+            res = requests.get(self.url)
+        except:
+            print('Can not get (%r)' % self.url)
+            return None
 
-    def __rper__(self):
-        return self._title
+        data = res.text
+        if res.status_code != 200:  # the http status
+            print("http status: %d, url = %s" % (
+                res.status_code, self.url
+            ))
+            return None
 
-# parameter url must be an absolute path ( including http://... )
-    @property
-    def title(self):
-        return self._title
-
-    @title.setter
-    def title(self, title):
-        if not isinstance(title, str):
-            raise TypeError("Excepted a string")
-        self._title = title
+        result = RE_MAGNET.search(data)
+        try:
+            self._magnet_link = result.group(1)
+        except:
+            print('Can not find magnet')
+            return None
+        return self._magnet_link
 
     @property
     def magnet(self):
-        if not self._magnet:
-            self._magnet = self.GetMagnetLink(self._url)
-        return self._magnet
+        """
+        return magnet link, for backward compatibility
+        """
+        return self.get_magnet_link()
 
-    @magnet.setter
-    def magnet(self, magnet):
-        if not isinstance(magnet, str):
-            raise TypeError("Excepted a string")
-        self._magnet = magnet
+    def __str__(self):
+        return repr(self)
 
-    @property
-    def url(self):
-        return self._url
-
-    @url.setter
-    def url(self, url):
-        if not isinstance(url, str):
-            raise TypeError("Excepted a string")
-        self._url = url
-
-    @property
-    def date(self):
-        return self._date
-
-    @date.setter
-    def date(self, date):
-        if isinstance(date, str):
-            self._date = date
-        else:
-            raise TypeError("Excepted a string")
+    def __repr__(self):
+        return '%s(title=%r, url=%r, date=%r)' % (
+            self.__class__.__name__,
+            self.title, self.url, self.date
+        )
 
 # get an parameter, keywords it can be a string or a list
 
 
 def Search(keyword):
+    """
+    returns a generator that yields AnimateEntry instance with your keywords
 
+    :param:keyword: your keywords
+    :type:keyword: str, list, tuple
+    """
     if isinstance(keyword, str):
         # keywords should split by space(s)
         keyword_list = filter(None, keyword.split(' '))
@@ -120,9 +103,8 @@ def Search(keyword):
                 source.span.unwrap()
             title = source.get_text().strip()
             url = "http://share.dmhy.org"+source['href']
-            magnet = topic.find(class_="download-arrow arrow-magnet")
-            animation = dmhy(title=title, url=url)
-            if magnet:
-                animation.magnet = magnet['href']
-            animation.date = date
+            magnet_anchor = topic.find(class_="download-arrow arrow-magnet")
+            animation = AnimateEntry(
+                title, url, date, magnet_anchor and magnet_anchor['href']
+            )
             yield animation
