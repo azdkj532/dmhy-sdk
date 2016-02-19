@@ -114,3 +114,10 @@ def search(keywords):
         yield AnimateEntry(
             title, url, date, magnet_anchor and magnet_anchor['href']
         )
+
+def Search(keywords):
+    import sys
+    print('Warning: dmhy.Serach is deprecated, use dmhy.serach instead.',
+            file=sys.stderr)
+    for result in search(keywords):
+        yield result
