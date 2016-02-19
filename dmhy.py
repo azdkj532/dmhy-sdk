@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 RE_MAGNET = re.compile(r'href="(magnet:.+)"')
 
-__all__ = [ 'AnimateEntry', 'Search', 'DMHYError', 'NetworkError' ]
+__all__ = [ 'AnimateEntry', 'search', 'DMHYError', 'NetworkError' ]
 
 class DMHYError(Exception):
     def __init__(self, description, source_error):
@@ -73,7 +73,7 @@ class AnimateEntry(object):
 # get an parameter, keywords it can be a string or a list
 
 
-def Search(keywords):
+def search(keywords):
     """
     returns a generator that yields AnimateEntry instance with your keywords
 
