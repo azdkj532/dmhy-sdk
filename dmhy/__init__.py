@@ -7,7 +7,26 @@ from bs4 import BeautifulSoup
 
 RE_MAGNET = re.compile(r'href="(magnet:.+)"')
 
-__all__ = [ 'AnimateEntry', 'Search']
+__all__ = [ 'AnimateEntry', 'Search', 'DMHYError', 'NetworkError' ]
+
+class DMHYError(Exception):
+    def __init__(self, description, source_error):
+        super().__init__()
+        self.description = description
+        self.source_error = source_error
+
+    def __repr__(self):
+        return '%s(%r, %r)' % (
+            self.__class__.__name__, self.description, self.source_error
+        )
+
+    def __str__(self):
+        return repr(self)
+
+
+class NetworkError(DMHYError):
+    def __init__(self, description, source_error=None):
+        super().__init__(description, source_error)
 
 class AnimateEntry(object):
     def __init__(self, title, url, date, magnet_link=None):
@@ -22,23 +41,17 @@ class AnimateEntry(object):
 
         try:
             res = requests.get(self.url)
-        except:
-            print('Can not get (%r)' % self.url)
-            return None
+        except Exception as ex:
+            raise NetworkError('failed to get url: %r' % self.url, ex)
 
         data = res.text
         if res.status_code != 200:  # the http status
-            print("http status: %d, url = %s" % (
+            raise NetworkError('non-200 http status code (%d) for url %r' % (
                 res.status_code, self.url
-            ))
-            return None
+            ), None)
 
         result = RE_MAGNET.search(data)
-        try:
-            self._magnet_link = result.group(1)
-        except:
-            print('Can not find magnet')
-            return None
+        self._magnet_link = result and result.group(1)
         return self._magnet_link
 
     @property
@@ -60,51 +73,44 @@ class AnimateEntry(object):
 # get an parameter, keywords it can be a string or a list
 
 
-def Search(keyword):
+def Search(keywords):
     """
     returns a generator that yields AnimateEntry instance with your keywords
 
-    :param:keyword: your keywords
-    :type:keyword: str, list, tuple
+    :param:keywords: your keywords
+    :type:keywords: str, list, tuple, or any iterable type
     """
-    if isinstance(keyword, str):
-        # keywords should split by space(s)
-        keyword_list = filter(None, keyword.split(' '))
-    elif isinstance(keyword, (list, tuple)):
-        if all([isinstance(_, str) for _ in keyword]):
-            keyword_list = keyword
-        else:
-            raise TypeError("Excepted a string")
+    if hasattr(keywords, '__iter__'):
+        keywords = ' '.join(keywords)
     else:
-        raise TypeError("Expected a string or a list of string")
-    keyword_list = [_ for _ in filter(None, keyword_list)]
-    url = u"http://share.dmhy.org/topics/list?keyword={0}" \
-          .format('+'.join(keyword_list))
+        keywords = str(keywords)
 
     try:
-        res = requests.get(url)
-    except:
-        raise StopIteration
+        res = requests.get("http://share.dmhy.org/topics/list", params={
+            'keyword': keywords
+        })
+    except Exception as ex:
+        raise NetworkError('failed to get search results', ex)
 
     if res.status_code != 200:
-        raise StopIteration
+        raise NetworkError(
+            'search results page returned non-200 http status (%d)' % (
+                res.status_code
+            ), ex
+        )
 
-    html = res.content
-    parser = BeautifulSoup(html.decode(), "html.parser")
+    parser = BeautifulSoup(res.text, "html5lib")
     try:
         table = parser.find(id='topic_list').tbody.find_all('tr')
-    except:
-        raise StopIteration
-    else:
-        for topic in table:
-            date = topic.find(style="display: none;").get_text()
-            source = topic.find(target="_blank")
-            while source.find('span') is not None:
-                source.span.unwrap()
-            title = source.get_text().strip()
-            url = "http://share.dmhy.org"+source['href']
-            magnet_anchor = topic.find(class_="download-arrow arrow-magnet")
-            animation = AnimateEntry(
-                title, url, date, magnet_anchor and magnet_anchor['href']
-            )
-            yield animation
+    except Exception as ex:
+        raise DMHYError('can not extract search result', ex)
+
+    for topic in table:
+        date = topic.select('td span')[0].text
+        source = topic.find('a', target="_blank")
+        title = source.text.strip()
+        url = "http://share.dmhy.org" + source['href']
+        magnet_anchor = topic.find(class_="download-arrow arrow-magnet")
+        yield AnimateEntry(
+            title, url, date, magnet_anchor and magnet_anchor['href']
+        )
