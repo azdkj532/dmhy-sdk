@@ -7,7 +7,7 @@ setup(name='dmhy',
       author='azdkj AZ',
       author_email='azdkj532@gmail.com',
       license='?',
-      packages=['dmhy'],
+      py_modules=['dmhy'],
       install_requires=[
           'BeautifulSoup4',
           'requests'
